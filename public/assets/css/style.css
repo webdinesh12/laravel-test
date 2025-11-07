@@ -1,0 +1,43 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    background: #f6f7f8;
+}
+
+:root {
+    --font-color: #242b3b;
+    --icon-color: #465368;
+}
+
+.link-style {
+    text-decoration: none;
+}
+
+.icon-wrapper {
+    padding: 8px;
+    background: #eff3f7;
+    font-size: 15px;
+}
+
+.icon-box {
+    width: 40px;
+    height: 40px;
+    color: var(--icon-color);
+}
+
+.link-box {
+    background: #ffffff;
+    padding: 10px 15px;
+    border-radius: 10px;
+}
+
+.box-details {
+    color: var(--font-color)
+}
+
+.container {
+    max-width: 500px !important;
+}
