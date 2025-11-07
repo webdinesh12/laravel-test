@@ -15,10 +15,24 @@ class HomeController extends Controller
         return view('index');
     }
 
-    public function createuser()
+    public function users()
     {
         $users = User::orderBy('created_at', 'DESC')->get();
-        return view('create-user', compact('users'));
+        return view('users', compact('users'));
+    }
+
+    public function createuser()
+    {
+        return view('create-user');
+    }
+
+    public function editUser($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found.');
+        }
+        return view('create-user', compact('user'));
     }
     public function audioLength()
     {
@@ -29,11 +43,12 @@ class HomeController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
+                'id' => ['nullable', 'exists:users,id'],
                 'name' => ['required', 'regex:/^[A-Za-z ]+$/'],
                 'email' => ['required', 'email'],
                 'mobile_no' => ['bail', 'required', 'numeric', 'digits:10'],
-                'password' => ['required', 'min:8'],
-                'profile_pic' => ['required', 'mimes:jpg,jpeg,png']
+                'password' => empty($request->id) ? ['required', 'min:8'] : ['nullable', 'min:8'],
+                'profile_pic' => empty($request->id) ? ['required', 'mimes:jpg,jpeg,png'] : ['nullable', 'mimes:jpg,jpeg,png']
             ], [
                 'name.regex' => 'Only charecters and spaces are allowed.'
             ]);
@@ -43,10 +58,15 @@ class HomeController extends Controller
             }
 
             $user = new User();
+            if (!empty($request->id)) {
+                $user = User::find($request->id);
+            }
             $user->name = $request->name;
             $user->email = $request->email;
             $user->phone = $request->mobile_no;
-            $user->password = $request->password;
+            if (!empty($request->password)) {
+                $user->password = $request->password;
+            }
             if ($request->hasFile('profile_pic')) {
                 $image = $request->file('profile_pic');
                 $name = uniqid('IMG_') . '.' . $image->getClientOriginalExtension();
@@ -55,8 +75,8 @@ class HomeController extends Controller
                 $user->image = $dbName;
             }
             $user->save();
-            session()->flash('success', 'User created successfully.');
-            return response()->json(['success' => 1, 'msg' => 'User created successfully.']);
+            session()->flash('success', 'User ' . (empty($request->id) ? 'created' : 'updated') . ' successfully.');
+            return response()->json(['success' => 1, 'redirect' => route('users')]);
         } catch (Exception $err) {
             return response()->json(['success' => 0, 'msg' => 'Something went wrong.']);
         }

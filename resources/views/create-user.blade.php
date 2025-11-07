@@ -48,12 +48,13 @@
     <div class="container">
         <form action="{{ route('do.create.user') }}" id="createUserForm" enctype="multipart/form-data" method="POST"
             class="creteuserform mt-5 p-4" autocomplete="off">
-            @if (session()->has('success'))
-                <p class="text-success text-center">{{ session('success') }}</p>
-            @endif
             @csrf
-            <div class="form-group mb-2 d-none" id="profile_pic_wrapper">
-                <img src="" class="profile-pic-preview">
+            <div class="form-group mb-2">
+                <input type="hidden" name="id" value="{{ $user?->id ?? '' }}" id="id">
+                <span class="error text-danger id_error"></span>
+            </div>
+            <div class="form-group mb-2 {{ empty($user?->image ?? '') ? 'd-none' : '' }}" id="profile_pic_wrapper">
+                <img src="{{ asset($user?->image ?? '') }}" class="profile-pic-preview">
             </div>
             <div class="form-group mb-2">
                 <label for="profile_pic">Profile Picture: </label>
@@ -62,21 +63,26 @@
             </div>
             <div class="form-group mb-2">
                 <label for="name">Name: </label>
-                <input type="text" name="name" class="form-control" id="name">
+                <input type="text" name="name" class="form-control" id="name" value="{{ $user?->name ?? '' }}">
                 <span class="error text-danger name_error"></span>
             </div>
             <div class="form-group mb-2">
                 <label for="email">Email: </label>
-                <input type="text" name="email" class="form-control" id="email">
+                <input type="text" name="email" class="form-control" id="email" value="{{ $user?->email ?? '' }}">
                 <span class="error text-danger email_error"></span>
             </div>
             <div class="form-group mb-2">
                 <label for="mobile_no">Mobile No: </label>
-                <input type="text" name="mobile_no" class="form-control" id="mobile_no">
+                <input type="text" name="mobile_no" class="form-control" id="mobile_no"
+                    value="{{ $user?->phone ?? '' }}">
                 <span class="error text-danger mobile_no_error"></span>
             </div>
             <div class="form-group mb-2">
-                <label for="password">Password: </label>
+                <label for="password">Password:
+                    <span class="text-muted text-sm">
+                        {{ !empty($user) ? '(Keep is blank if you don\'t want to update)' : '' }}
+                    </span>
+                </label>
                 <input type="password" name="password" class="form-control" id="password">
                 <span class="error text-danger password_error"></span>
             </div>
@@ -86,32 +92,6 @@
                 </button>
             </div>
         </form>
-
-        <div class="users-list mt-5">
-            <h5 class="h5 text-center mb-3">Users List</h5>
-            @forelse ($users as $user)
-                <div class="user mb-3">
-                    <div class="row">
-                        <div class="col-3">
-                            <img src="{{ asset($user->image) }}" alt="{{ $user->name }}">
-                        </div>
-                        <div class="col-9">
-                            <div class="details">
-                                <p><strong>Name: </strong>{{ $user?->name ?? '-' }}</p>
-                                <p><strong>Email: </strong>{{ $user?->email ?? '-' }}</p>
-                                <p><strong>Mobile No.: </strong>{{ $user?->phone ?? '-' }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
-            @empty
-                <div class="no-records p-4">
-                    <p class="text-center">No records found.</p>
-                </div>
-            @endforelse
-        </div>
     </div>
 @endsection
 
@@ -146,7 +126,7 @@
                                 alert(res.msg || 'Something went wrong.');
                             }
                         } else {
-                            window.location.reload();
+                            window.location.href = res.redirect;
                         }
                     },
                     beforeSend: function() {
