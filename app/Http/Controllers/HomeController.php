@@ -34,6 +34,20 @@ class HomeController extends Controller
         }
         return view('create-user', compact('user'));
     }
+
+    public function deleteUser($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found.');
+        }
+        if (file_exists(storage_path(str_replace('storage/', 'app/public/', $user->image)))) {
+            unlink(storage_path(str_replace('storage/', 'app/public/', $user->image)));
+        }
+        $user->delete();
+        return redirect()->back()->with('success', 'User deleted successfully.');
+    }
+
     public function audioLength()
     {
         return view('audio-length');

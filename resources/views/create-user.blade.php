@@ -1,49 +1,5 @@
 @extends('layout.app')
 
-@push('css')
-    <style>
-        .creteuserform {
-            background: #fff;
-            border-radius: 10px;
-        }
-
-        .creteuserform label {
-            margin-bottom: 10px;
-        }
-
-        .submit-btn {
-            border-radius: 0;
-            background: #137fec;
-            border: 0px;
-            width: 100%;
-            margin-top: 8px;
-        }
-
-        .profile-pic-preview {
-            height: 100px;
-            width: 100px;
-            object-fit: cover;
-            margin: auto;
-            margin-bottom: auto;
-            display: block;
-            border: 1px solid #cecece;
-            border-radius: 7px;
-            margin-bottom: 15px;
-        }
-
-        .user img {
-            height: 100px;
-            width: 100px;
-            object-fit: cover;
-            margin-bottom: 10px;
-        }
-
-        .user p {
-            margin-bottom: 5px;
-        }
-    </style>
-@endpush
-
 @section('content')
     <div class="container">
         <form action="{{ route('do.create.user') }}" id="createUserForm" enctype="multipart/form-data" method="POST"

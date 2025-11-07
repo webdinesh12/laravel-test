@@ -1,14 +1,5 @@
 @extends('layout.app')
 
-@push('css')
-    <style>
-        .users-table th,
-        .users-table td {
-            vertical-align: middle;
-        }
-    </style>
-@endpush
-
 @section('content')
     <div class="container pt-5" style="max-width: 1200px !important;">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -68,3 +59,23 @@
         </div>
     </div>
 @endsection
+
+@push('js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('.delete-user').on('click', function() {
+                let route = $(this).data('route');
+                Swal.fire({
+                    icon: "warning",
+                    html: `Are you sure you want to delete the user?`,
+                    showCancelButton: true,
+                    confirmButtonText: "Yes",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = route;
+                    }
+                });
+            })
+        });
+    </script>
+@endpush
