@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\UserExport;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use League\Geotools\Coordinate\Coordinate;
+use League\Geotools\Geotools;
+use Maatwebsite\Excel\Facades\Excel;
 use wapmorgan\Mp3Info\Mp3Info;
 
 class HomeController extends Controller
@@ -33,6 +37,12 @@ class HomeController extends Controller
             return redirect()->back()->with('error', 'User not found.');
         }
         return view('create-user', compact('user'));
+    }
+
+    public function exportUsers()
+    {
+        $users = User::orderBy('created_at', 'DESC')->get();
+        return Excel::download(new UserExport($users), 'User_Export_' . date('YmdHis') . '.xlsx');
     }
 
     public function deleteUser($id)
@@ -125,5 +135,29 @@ class HomeController extends Controller
         } catch (Exception $err) {
             return response()->json(['success' => 0, 'msg' => 'Something went wrong.']);
         }
+    }
+
+    public function findDistence()
+    {
+        return view('distence');
+    }
+
+    public function doFindDistence(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'from_latitude' => ['required', 'numeric'],
+            'from_longitude' => ['required', 'numeric'],
+            'to_latitude' => ['required', 'numeric'],
+            'to_longitude' => ['required', 'numeric']
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => 0, 'errors' => $validator->errors()]);
+        }
+
+        $fromCord = new Coordinate([$request->from_latitude, $request->from_longitude]);
+        $toCord = new Coordinate([$request->to_latitude, $request->to_longitude]);
+        $distence = number_format((new Geotools())->distance()->setFrom($fromCord)->setTo($toCord)->in('km')->haversine() ?? 0, 2, '.', ',');
+        return $distence > 0 ? response()->json(['success' => 1, 'msg' => 'The distence between these two location is: <strong>' . $distence . 'KM</strong>']) : response()->json(['success' => 0, 'msg' => 'Wrong latitude or longitude']);
     }
 }

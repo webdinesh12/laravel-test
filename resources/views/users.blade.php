@@ -8,7 +8,7 @@
                 <a href="{{ route('user.create') }}" class="btn btn-sm btn-outline-primary me-2">
                     Add New User
                 </a>
-                <a href="{{ route('user.create') }}" class="btn btn-sm btn-outline-success">
+                <a href="{{ route('user.export') }}" class="btn btn-sm btn-outline-success">
                     Export
                 </a>
             </div>
